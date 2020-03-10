@@ -1,5 +1,5 @@
 {
-  "name": "api-ionic",
+  "name": "e-noticeboard-api",
   "version": "1.0.0",
   "description": "Ionic API for testing",
   "main": "src/server.js",

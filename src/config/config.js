@@ -1,4 +1,4 @@
 module.exports = {
     jwtSecret: 'long-live-nodejs',
-    db: 'mongodb://localhost/ionic-jwt'
+    db: 'mongodb://localhost/e-noticeboard'
 };
