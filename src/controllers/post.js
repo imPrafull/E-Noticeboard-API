@@ -2,6 +2,8 @@ const Post = require('../models/post');
 
 exports.getPosts = (req, res) => {
     const posts = Post.find()
+        .populate('createdBy', '-_id email')
+        .select('_id title body createdBy createdAt updatedAt')
         .then(posts => {
             res.json({ posts: posts })
         })
