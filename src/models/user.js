@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
-var UserSchema = new mongoose.Schema({
+const UserSchema = new mongoose.Schema({
     email: {
         type: String,
         unique: true,
@@ -13,6 +13,10 @@ var UserSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true
+    },
+    isVerified: {
+        type: Boolean,
+        default: false
     }
 });
 
