@@ -69,6 +69,7 @@ exports.loginUser = (req, res) => {
         }
 
         if (!user) {
+            console.log(req.body.email)
             return res.status(400).json({'msg': 'User does not exist'});
         }
 
