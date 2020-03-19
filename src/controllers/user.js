@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const config = require('../config/config');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+const url = require('url');
 
 function createToken(user) {
     return jwt.sign({ id: user.id, email: user.email }, config.jwtSecret, {
@@ -43,7 +44,7 @@ exports.registerUser = (req, res) => {
                      from: 'prafullsakpal15898@gmail.com',
                      to: user.email,
                      subject: 'Account Verification',
-                     text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/confirmation\/' + token.token + '.\n'
+                     text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/api\/confirmation?token=' + token.token + '.\n'
                 };
                 transporter.sendMail(mailOptions, (err) => {
                     if (err) {
@@ -93,13 +94,15 @@ exports.loginUser = (req, res) => {
 
 exports.confirmationGet = function (req, res) {
     // Find a matching token
-    Token.findOne({ token: req.body.token }, function (err, token) {
+    let queryObject = url.parse(req.url, true).query;
+    let token = queryObject['token'];
+    Token.findOne({ token: token }, function (err, token) {
         if (!token) {
             return res.status(400).json({ msg: 'We were unable to find a valid token. Your token my have expired.' });
         }
  
         // If we found a token, find a matching user
-        User.findOne({ _id: token._userId, email: req.body.email }, function (err, user) {
+        User.findOne({ _id: token._userId }, function (err, user) {
             if (!user) return res.status(400).send({ msg: 'We were unable to find a user for this token.' });
             if (user.isVerified) return res.status(400).send({ type: 'already-verified', msg: 'This user has already been verified.' });
  
