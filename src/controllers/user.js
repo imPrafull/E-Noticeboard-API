@@ -8,7 +8,7 @@ const url = require('url');
 
 function createToken(user) {
     return jwt.sign({ id: user.id, email: user.email }, config.jwtSecret, {
-        expiresIn: 120
+        expiresIn: 1200000
     })
 }
 
@@ -50,7 +50,7 @@ exports.registerUser = (req, res) => {
                     if (err) {
                         return res.status(400).json({'msg': err});
                     }
-                    return res.status(200).send('A verification email has been sent to ' + user.email + '.');
+                    return res.status(200).json('A verification email has been sent to ' + user.email + '.');
                 });
             });
             //return res.status(200).json(user);
@@ -99,19 +99,19 @@ exports.confirmationGet = function (req, res) {
     let token = queryObject['token'];
     Token.findOne({ token: token }, function (err, token) {
         if (!token) {
-            return res.status(400).json({ msg: 'We were unable to find a valid token. Your token my have expired.' });
+            return res.status(400).json({ 'msg': 'We were unable to find a valid token. Your token my have expired.' });
         }
  
         // If we found a token, find a matching user
         User.findOne({ _id: token._userId }, function (err, user) {
-            if (!user) return res.status(400).send({ msg: 'We were unable to find a user for this token.' });
-            if (user.isVerified) return res.status(400).send({ type: 'already-verified', msg: 'This user has already been verified.' });
+            if (!user) return res.status(400).json({ msg: 'We were unable to find a user for this token.' });
+            if (user.isVerified) return res.status(400).json({ type: 'already-verified', 'msg': 'This user has already been verified.' });
  
             // Verify and save the user
             user.isVerified = true;
             user.save(function (err) {
-                if (err) { return res.status(500).send({ msg: err.message }); }
-                res.status(200).send("The account has been verified. Please log in.");
+                if (err) { return res.status(500).json({ msg: err.message }); }
+                res.status(200).json("The account has been verified. Please log in.");
             });
         });
     });
