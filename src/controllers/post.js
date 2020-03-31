@@ -13,9 +13,12 @@ exports.getPosts = (req, res) => {
 exports.createPost = (req, res) => {
     const post = new Post(req.body);
     post.save()
-        .then(result => {
-            res.status(200).json({
-                post: result
+        .then(post => {
+            post.populate('createdBy', '-_id email')
+                .execPopulate().then(post => {
+                    res.status(200).json({
+                    post: post
+                });
             });
         });
 }
