@@ -16,8 +16,11 @@ exports.createGroup = (req, res) => {
     group.members.push(req.body.createdBy);
     group.save()
         .then(group => {
-            res.status(200).json({
-                group: group
+            group.populate('createdBy', '-_id email')
+                .execPopulate().then(group => {
+                    res.status(200).json({
+                    group: group
+                });
             });
         })
         .catch(err => {
