@@ -13,6 +13,7 @@ const app = express();
 //bring in routes
 const authRoutes = require('./routes/auth');
 const postRoutes = require('./routes/post');
+const groupRoutes = require('./routes/group');
 
 //middleware
 app.use(bodyParser.urlencoded({extended: false}));
@@ -21,7 +22,7 @@ app.use(expressValidator());
 app.use(passport.initialize());
 passport.use(passportMiddleware);
 app.use(cors());
-app.use('/api', authRoutes, postRoutes);
+app.use('/api', authRoutes, postRoutes, groupRoutes);
 
 //db connection
 mongoose.connect(config.db, {useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true});
