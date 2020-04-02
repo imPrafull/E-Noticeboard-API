@@ -7,7 +7,7 @@ const nodemailer = require('nodemailer');
 const url = require('url');
 
 function createToken(user) {
-    return jwt.sign({ id: user.id, email: user.email }, config.jwtSecret, {
+    return jwt.sign({ id: user.id, email: user.email, role: user.role }, config.jwtSecret, {
         expiresIn: 1200000
     })
 }

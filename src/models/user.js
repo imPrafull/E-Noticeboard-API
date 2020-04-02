@@ -17,6 +17,11 @@ const UserSchema = new mongoose.Schema({
     isVerified: {
         type: Boolean,
         default: false
+    },
+    role: {
+        type: String,
+        required: true,
+        default: 'student'
     }
 });
 
