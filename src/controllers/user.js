@@ -60,7 +60,7 @@ exports.registerUser = (req, res) => {
 
 exports.loginUser = (req, res) => {
     if(!req.body.email || !req.body.password) {
-        return res.status(400).json({'msg': 'You need to send email and password'});
+        return res.status(400).json({'msg': 'You need to send email and password!'});
     }
 
     User.findOne({ email: req.body.email}, (err, user) => {
@@ -69,8 +69,11 @@ exports.loginUser = (req, res) => {
         }
 
         if (!user) {
-            console.log(req.body.email)
-            return res.status(400).json({'msg': 'User does not exist'});
+            return res.status(400).json({'msg': 'User does not exist!'});
+        }
+
+        if (user && !user.isVerified) {
+            return res.status(403).json({'msg': 'Email Id is not verified!'});
         }
 
         user.comparePassword(req.body.password, (err, isMatch) => {
