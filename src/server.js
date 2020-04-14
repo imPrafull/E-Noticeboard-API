@@ -25,7 +25,7 @@ app.use(cors());
 app.use('/api', authRoutes, postRoutes, groupRoutes);
 
 //db connection
-mongoose.connect(config.db, {useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true});
+mongoose.connect(config.db, {useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true, useFindAndModify: false});
 const connection = mongoose.connection;
 connection.once('open', () => console.log('Mongodb connection established successfully!'));
 connection.on('error', (err) => {

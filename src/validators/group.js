@@ -2,8 +2,8 @@ exports.groupValidator = (req, res, next) => {
     //name
     req.check('name', 'Enter a Name').notEmpty();
     req.check('name', 'Group Name must be between 1 to 150 characters').isLength({
-        min: 1,
-        max: 150
+        min: 4,
+        max: 250
     });
     //check for errors
     const errors = req.validationErrors();
