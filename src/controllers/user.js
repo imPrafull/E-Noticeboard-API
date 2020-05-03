@@ -23,7 +23,38 @@ exports.registerUser = (req, res) => {
         }
 
         if (user) {
-            return res.status(400).json({'msg': 'User already exists'});
+            if (user.isAdded === true) {
+                let addedUser = req.body;
+                addedUser.save((err, user) => {
+                    if(err) {
+                        return res.status(400).json({'msg': err});
+                    }
+        
+                    var token = new Token({ _userId: user._id, token: crypto.randomBytes(16).toString('hex') });
+                    token.save((err) => {
+                        if(err) {
+                            return res.status(400).json({'msg': err});
+                        }
+        
+                        var transporter = nodemailer.createTransport({ service: 'gmail', auth: { user: config.user, pass: config.pass } });
+                        const mailOptions = {
+                             from: 'prafullsakpal15898@gmail.com',
+                             to: user.email,
+                             subject: 'Account Verification',
+                             text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/api\/confirmation?token=' + token.token + '.\n'
+                        };
+                        transporter.sendMail(mailOptions, (err) => {
+                            if (err) {
+                                return res.status(400).json({'msg': err});
+                            }
+                            return res.status(200).json('A verification email has been sent to ' + user.email + '.');
+                        });
+                    });
+                });
+            }
+            else {
+                return res.status(400).json({'msg': 'User already exists'});
+            }
         }
 
         let newUser = User(req.body);
