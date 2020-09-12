@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const SubgroupSchema = new mongoose.Schema({
     name: {
         type: String,
-        unique: true,
+        unique: false,
         required: true
     },
     createdBy: {
@@ -10,11 +10,12 @@ const SubgroupSchema = new mongoose.Schema({
         ref: 'User'
     },
     members: [{
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
         unique: true
     }],
 }, {timestamps: true});
-
+ 
 const GroupSchema = new mongoose.Schema({
     name: {
         type: String,

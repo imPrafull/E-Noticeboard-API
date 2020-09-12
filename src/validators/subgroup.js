@@ -1,16 +1,16 @@
 exports.subgroupValidator = (req, res, next) => {
     // name
-    req.check('subgroups.name', 'Enter a Name').notEmpty();
-    req.check('subgroups.name', 'Group Name must be between 1 to 150 characters').isLength({
+    req.check('subgroup.name', 'Enter a Name').notEmpty();
+    req.check('subgroup.name', 'Group Name must be between 1 to 150 characters').isLength({
         min: 1,
         max: 100
     }); 
     // created by
-    req.check('subgroups.createdBy', 'Created by cannot be empty').notEmpty();
+    req.check('subgroup.createdBy', 'Created by cannot be empty').notEmpty();
     // id
     req.check('id', 'Enter an id').notEmpty();
     // members
-    req.check('subgroups.members', 'members cannot be empty')
+    req.check('subgroup.members', 'members cannot be empty')
     
     //check for errors
     const errors = req.validationErrors();

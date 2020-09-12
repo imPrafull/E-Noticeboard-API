@@ -35,15 +35,15 @@ exports.createGroup = (req, res) => {
 
 // create subgroup
 exports.createSubgroup = (req, res) => {
-    Group.findOneAndUpdate({_id: req.body.id, 'subgroups.name': {$ne: req.body.subgroups.name}}, { $addToSet: { subgroups: req.body.subgroups } }, {new: true})
+    Group.findOneAndUpdate({_id: req.body.id, 'subgroups.name': {$ne: req.body.subgroup.name}}, { $addToSet: { subgroups: req.body.subgroup } }, {new: true})
         .then(group => {
             if (group == null) {
-                res.status(400).json({'msg': 'Subroup Name already exists!'});
+                res.status(400).json({'msg': 'Subgroup Name already exists!'});
                 return;
             }
             group.populate('createdBy', '-_id email')
                 .populate('subgroups.createdBy', '-_id email')
-                // .populate('subgroups.members', '-_id email')
+                .populate('subgroups.members', '-_id email')
                 .execPopulate().then(group => {
                     res.status(200).json({
                     group: group
