@@ -178,7 +178,7 @@ exports.resendTokenGet = function (req, res, next) {
                 from: 'prafullsakpal15898@gmail.com', 
                 to: user.email, 
                 subject: 'Account Verification', 
-                text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/confirmation\/' + token.token + '.\n' 
+                text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/api\/confirmation?token=' + token.token + '.\n' 
             };
             transporter.sendMail(mailOptions, function (err) {
                 if (err) { 

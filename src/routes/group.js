@@ -12,4 +12,4 @@ routes.route('/groups')
 routes.route('/subgroups')
     .post(passport.authenticate('jwt', {session: false}) , subgrupValidator.subgroupValidator, groupController.createSubgroup)
     .put(passport.authenticate('jwt', {session: false}) , subgrupValidator.memberValidator, groupController.updateSubgroup);
-module.exports = routes;
+module.exports = routes; 
