@@ -1,10 +1,11 @@
 const Group = require('../models/group');
 const User = require('../models/user');
 
+// get groups
 exports.getGroups = (req, res) => {
     const groups = Group.find()
         .populate('createdBy', '-_id email')
-        .populate('subgroups.members', '-_id email')
+        // .populate('subgroups.members', '-_id email')
         .populate('subgroups.createdBy', '-_id email')
         .select('_id name createdBy subgroups createdAt updatedAt')
         .then(groups => {
@@ -13,6 +14,7 @@ exports.getGroups = (req, res) => {
         .catch(err => console.log(err));
 }
 
+// create group
 exports.createGroup = (req, res) => {
     const group = new Group(req.body);
     group.save()
@@ -31,6 +33,7 @@ exports.createGroup = (req, res) => {
         });
 }
 
+// create subgroup
 exports.createSubgroup = (req, res) => {
     Group.findOneAndUpdate({_id: req.body.id, 'subgroups.name': {$ne: req.body.subgroups.name}}, { $addToSet: { subgroups: req.body.subgroups } }, {new: true})
         .then(group => {
@@ -40,7 +43,7 @@ exports.createSubgroup = (req, res) => {
             }
             group.populate('createdBy', '-_id email')
                 .populate('subgroups.createdBy', '-_id email')
-                .populate('subgroups.members', '-_id email')
+                // .populate('subgroups.members', '-_id email')
                 .execPopulate().then(group => {
                     res.status(200).json({
                     group: group
@@ -51,6 +54,7 @@ exports.createSubgroup = (req, res) => {
         .catch(err => console.log(err));
 }
 
+// add member
 exports.updateSubgroup = (req, res) => {
     Group.findOneAndUpdate({'_id': req.body.groupId, 'subgroups._id': req.body.subgroupId, 'subgroups.members': {$nin: req.body.member}}, { $addToSet: { 'subgroups.$.members': req.body.member } }, {new: true})
         .then(group => {

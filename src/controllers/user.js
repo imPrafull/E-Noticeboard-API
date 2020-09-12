@@ -1,10 +1,12 @@
-const User = require('../models/user');
 const Token = require('../models/token');
 const jwt = require('jsonwebtoken');
 const config = require('../config/config');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const url = require('url');
+
+const User = require('../models/user');
+const Group = require('../models/group');
 
 function createToken(user) {
     return jwt.sign({ id: user.id, email: user.email, role: user.role }, config.jwtSecret, {
@@ -188,3 +190,25 @@ exports.resendTokenGet = function (req, res, next) {
  
     });
 };
+
+exports.userDetails = function(req, res) {
+    let queryObject = url.parse(req.url, true).query;
+    let userid = queryObject['userid'];
+    User.findById(userid)
+        .select('_id email role')
+        .then(user => {
+            Group.find({ 'subgroups.members' : user.email })
+                .select('_id subgroups._id')
+                .then(groups => {
+                    let userDetails = {
+                        id: user._id,
+                        email: user.email,
+                        role: user.role
+                    };
+                    userDetails = {...userDetails, groups}
+                    res.json({ userDetails: userDetails });
+                })
+                .catch(err => console.log(err));
+        })
+        .catch(err => console.log(err));
+}
