@@ -73,10 +73,13 @@ exports.updateSubgroup = (req, res) => {
         else if (req.body.memberEmail) {
             User.findOne({ email: req.body.memberEmail }, (err, user) => {
                 if (err) {
+                    console.log('add user ', err, user)
                     return res.status(400).json({ 'msg': err });
                 }
 
-                if (user) {
+                if (user && user.isAdded) return res.status(200).json({ msg: 'Member Already Exists' });
+
+                if (user && !user.isAdded) {
                     subgroups = group.subgroups.map(subgroup => {
                         if (subgroup._id == req.body.subgroupId) {
                             subgroup.members.includes(user._id) ? res.status(200).json({ msg: 'Member Already Exists' }) : subgroup.members.push(user._id);
@@ -89,8 +92,9 @@ exports.updateSubgroup = (req, res) => {
                         .catch(err => console.log(err));
                 } else {
                     let newUser = User({ email: req.body.memberEmail, isAdded: true });
-                    newUser.save().then((err, user) => {
+                    newUser.save((err, user) => {
                         if (err) {
+                            console.log('add user ', err, user)
                             return res.status(400).json({ 'msg': err });
                         }
                         subgroups = group.subgroups.map(subgroup => {
