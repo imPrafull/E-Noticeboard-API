@@ -22,23 +22,23 @@ exports.createGroup = (req, res) => {
             group.populate('createdBy', '-_id email')
                 .execPopulate().then(group => {
                     res.status(200).json({
-                    group: group
+                        group: group
+                    });
                 });
-            });
         })
         .catch(err => {
-            if (err.code === 11000){
-                res.status(400).json({'msg': 'Group Name already exists!'});
+            if (err.code === 11000) {
+                res.status(400).json({ 'msg': 'Group Name already exists!' });
             }
         });
 }
 
 // create subgroup
 exports.createSubgroup = (req, res) => {
-    Group.findOneAndUpdate({_id: req.body.id, 'subgroups.name': {$ne: req.body.subgroup.name}}, { $addToSet: { subgroups: req.body.subgroup } }, {new: true})
+    Group.findOneAndUpdate({ _id: req.body.id, 'subgroups.name': { $ne: req.body.subgroup.name } }, { $addToSet: { subgroups: req.body.subgroup } }, { new: true })
         .then(group => {
             if (group == null) {
-                res.status(400).json({'msg': 'Subgroup Name already exists!'});
+                res.status(400).json({ 'msg': 'Subgroup Name already exists!' });
                 return;
             }
             group.populate('createdBy', '-_id email')
@@ -46,9 +46,9 @@ exports.createSubgroup = (req, res) => {
                 .populate('subgroups.members', '-_id email')
                 .execPopulate().then(group => {
                     res.status(200).json({
-                    group: group
+                        group: group
+                    });
                 });
-            });
 
         })
         .catch(err => console.log(err));
@@ -56,33 +56,56 @@ exports.createSubgroup = (req, res) => {
 
 // add member
 exports.updateSubgroup = (req, res) => {
-    Group.findOneAndUpdate({'_id': req.body.groupId, 'subgroups._id': req.body.subgroupId, 'subgroups.members': {$nin: req.body.member}}, { $addToSet: { 'subgroups.$.members': req.body.member } }, {new: true})
-        .then(group => {
-            if (group == null) {
-                res.status(400).json({'msg': 'Member already exists'});
-            }
-
-            User.findOne({ email: req.body.member}, (err, user) => {
-                if (err) {
-                    return res.status(400).json({'msg': err});
+    Group.findOne({ '_id': req.body.groupId }).then(group => {
+        let subgroups = []
+        if (req.body.memberId) {
+            subgroups = group.subgroups.map(subgroup => {
+                if (subgroup._id == req.body.subgroupId) {
+                    subgroup.members.findIndex(member => member == req.body.memberId) == -1 ? subgroup.members.push(req.body.memberId) : res.status(200).json({ msg: 'Member Already Exists' });
                 }
-        
-                if (user) {
-                    return res.status(400).json({'msg': 'User already exists'});
-                }
-
-                let newUser = User({email: req.body.member, isAdded: true});
-                newUser.save((err, user) => {
-                    if(err) {
-                        return res.status(400).json({'msg': err});
-                    }
-                    res.status(200).json({
-                        group: group
-                    });
-                });
+                return subgroup;
             });
+            group.set('group.subgroups', subgroups);
+            group.save()
+                .then(group => res.status(200).json({ msg: 'Member Added' }))
+                .catch(err => console.log(err));
+        }
+        else if (req.body.memberEmail) {
+            User.findOne({ email: req.body.memberEmail }, (err, user) => {
+                if (err) {
+                    return res.status(400).json({ 'msg': err });
+                }
 
-        })
-        .catch(err => console.log(err));
-}
-
+                if (user) {
+                    subgroups = group.subgroups.map(subgroup => {
+                        if (subgroup._id == req.body.subgroupId) {
+                            subgroup.members.includes(user._id) ? res.status(200).json({ msg: 'Member Already Exists' }) : subgroup.members.push(user._id);
+                        }
+                        return subgroup;
+                    });
+                    group.set('group.subgroups', subgroups);
+                    group.save()
+                        .then(group => res.status(200).json({ msg: 'Member Added' }))
+                        .catch(err => console.log(err));
+                } else {
+                    let newUser = User({ email: req.body.memberEmail, isAdded: true });
+                    newUser.save().then((err, user) => {
+                        if (err) {
+                            return res.status(400).json({ 'msg': err });
+                        }
+                        subgroups = group.subgroups.map(subgroup => {
+                            if (subgroup._id == req.body.subgroupId) {
+                                subgroup.membersToBe.includes(req.body.memberEmail) ? res.status(200).json({ msg: 'Member Already Exists' }) : subgroup.membersToBe.push(req.body.memberEmail);
+                            }
+                            return subgroup;
+                        });
+                        group.set('group.subgroups', subgroups);
+                        group.save()
+                            .then(group => res.status(200).json({ msg: 'Member Added' }))
+                            .catch(err => console.log(err));
+                    });
+                }
+            });
+        }
+    })
+}                     

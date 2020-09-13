@@ -12,8 +12,10 @@ const SubgroupSchema = new mongoose.Schema({
     members: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        unique: true
     }],
+    membersToBe: [{
+        type: String
+    }]
 }, {timestamps: true});
  
 const GroupSchema = new mongoose.Schema({

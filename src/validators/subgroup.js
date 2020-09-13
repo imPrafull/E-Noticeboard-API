@@ -28,8 +28,10 @@ exports.memberValidator = (req, res, next) => {
     req.check('groupId', 'Enter a groupId').notEmpty();
     // subgroupId
     req.check('subgroupId', 'Enter a subgroupid').notEmpty();
-    // member
-    req.check('member', 'Enter a member email').notEmpty();
+    // memberId
+    req.check('memberId', 'Enter a member id').notEmpty();
+    // member email
+    req.check('memberEmail', 'Enter a member email').notEmpty();
     
     //check for errors
     const errors = req.validationErrors();
