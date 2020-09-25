@@ -5,7 +5,7 @@ const User = require('../models/user');
 exports.getGroups = (req, res) => {
     const groups = Group.find()
         .populate('createdBy', '-_id email')
-        // .populate('subgroups.members', '-_id email')
+        .populate('subgroups.members', '-_id email')
         .populate('subgroups.createdBy', '-_id email')
         .select('_id name createdBy subgroups createdAt updatedAt')
         .then(groups => {
@@ -67,7 +67,17 @@ exports.updateSubgroup = (req, res) => {
             });
             group.set('group.subgroups', subgroups);
             group.save()
-                .then(group => res.status(200).json({ msg: 'Member Added' }))
+                .then(group => {
+                    group.populate('createdBy', '-_id email')
+                        .populate('subgroups.createdBy', '-_id email')
+                        .populate('subgroups.members', '-_id email')
+                        .execPopulate().then(group => {
+                            res.status(200).json({
+                                msg: 'Member Added',
+                                group: group
+                            });
+                        });
+                })
                 .catch(err => console.log(err));
         }
         else if (req.body.memberEmail) {
@@ -88,7 +98,17 @@ exports.updateSubgroup = (req, res) => {
                     });
                     group.set('group.subgroups', subgroups);
                     group.save()
-                        .then(group => res.status(200).json({ msg: 'Member Added' }))
+                        .then(group => {
+                            group.populate('createdBy', '-_id email')
+                                .populate('subgroups.createdBy', '-_id email')
+                                .populate('subgroups.members', '-_id email')
+                                .execPopulate().then(group => {
+                                    res.status(200).json({
+                                        msg: 'Member Added',
+                                        group: group
+                                    });
+                                });
+                        })
                         .catch(err => console.log(err));
                 } else {
                     let newUser = User({ email: req.body.memberEmail, isAdded: true });
@@ -105,7 +125,17 @@ exports.updateSubgroup = (req, res) => {
                         });
                         group.set('group.subgroups', subgroups);
                         group.save()
-                            .then(group => res.status(200).json({ msg: 'Member Added' }))
+                            .then(group => {
+                                group.populate('createdBy', '-_id email')
+                                    .populate('subgroups.createdBy', '-_id email')
+                                    .populate('subgroups.members', '-_id email')
+                                    .execPopulate().then(group => {
+                                        res.status(200).json({
+                                            msg: 'Member Added',
+                                            group: group
+                                        });
+                                    });
+                            })
                             .catch(err => console.log(err));
                     });
                 }
