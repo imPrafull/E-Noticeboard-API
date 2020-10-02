@@ -12,10 +12,6 @@ routes.post('/register', validator.authValidator, userController.registerUser);
 routes.post('/login', validator.authValidator, userController.loginUser);
 routes.get('/confirmation', userController.confirmationGet);
 routes.get('/resend', userController.resendTokenGet);
-routes.get('/user', passport.authenticate('jwt', {session: false}), userController.userDetails);
-
-routes.get('/special', passport.authenticate('jwt', {session: false}), (req, res) => {
-    return res.json({msg: `Hey ${req.user.email}!`});
-});
+routes.get('/userDetails', passport.authenticate('jwt', {session: false}), userController.userDetails);
 
 module.exports = routes;

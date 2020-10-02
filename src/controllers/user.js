@@ -205,18 +205,24 @@ exports.userDetails = function (req, res) {
     User.findById(userid)
         .select('_id email role')
         .then(user => {
-            Group.find({ 'subgroups.members': user.email })
-                .select('_id subgroups._id')
+            Group.find({ 'subgroups.members': userid })
                 .then(groups => {
+                    let groupIds = [];
+                    let subgroupIds = [];
+                    groups.forEach(group => {
+                        groupIds.push(group._id);
+                        group.subgroups.forEach(subgroup => subgroup.members.includes(userid) && subgroupIds.push(subgroup._id))
+                    });
                     let userDetails = {
                         id: user._id,
                         email: user.email,
-                        role: user.role
+                        role: user.role,
+                        groups: groupIds,
+                        subgroups: subgroupIds
                     };
-                    userDetails = { ...userDetails, groups }
                     res.json({ userDetails: userDetails });
                 })
                 .catch(err => console.log(err));
         })
         .catch(err => console.log(err));
-}
+} 
