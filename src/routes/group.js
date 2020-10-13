@@ -5,11 +5,18 @@ const groupValidator = require('../validators/group');
 const subgrupValidator = require('../validators/subgroup');
 const groupController = require('../controllers/group');
 
-routes.route('/groups') 
+routes.route('/groups')
     .post(passport.authenticate('jwt', {session: false}), groupValidator.groupValidator, groupController.createGroup)
     .get(passport.authenticate('jwt', {session: false}) , groupController.getGroups);
 
 routes.route('/subgroups')
     .post(passport.authenticate('jwt', {session: false}) , subgrupValidator.subgroupValidator, groupController.createSubgroup)
     .put(passport.authenticate('jwt', {session: false}) , subgrupValidator.memberValidator, groupController.updateSubgroup);
+
+routes.route('/groupsByUserid')
+    .get(passport.authenticate('jwt', {session: false}) , groupController.getGroupsById);
+
+routes.route('/subgroupsByUserid')
+    .get(passport.authenticate('jwt', {session: false}) , groupController.getSubgroupsById);
+
 module.exports = routes; 

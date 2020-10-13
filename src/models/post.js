@@ -13,6 +13,12 @@ const PostSchema = new mongoose.Schema({
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
+    },
+    groupId: {
+        type: String
+    },
+    subgroupId: {
+        type: String
     }
 }, {timestamps: true});
 

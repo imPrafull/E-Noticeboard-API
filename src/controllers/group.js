@@ -1,5 +1,6 @@
 const Group = require('../models/group');
 const User = require('../models/user');
+const url = require('url');
 
 // get groups
 exports.getGroups = (req, res) => {
@@ -142,4 +143,29 @@ exports.updateSubgroup = (req, res) => {
             });
         }
     })
-}                     
+}
+
+exports.getGroupsById = (req, res) => {
+    let queryObject = url.parse(req.url, true).query;
+    let userid = queryObject['userid'];
+    const groups = Group.find({ 'subgroups.members': userid })
+        .select('name')
+        .then(groups => {
+            res.json({ groups: groups })
+        })
+        .catch(err => console.log(err));
+}
+
+exports.getSubgroupsById = (req, res) => {
+    let queryObject = url.parse(req.url, true).query;
+    let userid = queryObject['userid'];
+    Group.find({ 'subgroups.members': userid })
+        .then(groups => {
+            let subgroups = [];
+            groups.forEach(group => {
+                group.subgroups.forEach(subgroup => subgroup.members.includes(userid) && subgroups.push({_id: subgroup._id, name: subgroup.name, college: group.name}))
+            });
+            res.json({ subgroups: subgroups })
+        })
+        .catch(err => console.log(err));
+}
